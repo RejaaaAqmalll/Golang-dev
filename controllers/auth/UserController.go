@@ -181,7 +181,7 @@ func ForgotPassword(c *gin.Context) {
 			"code":    http.StatusBadRequest,
 			"message": "Invalid email",
 		})
-		return
+
 	}
 
 	// Insert a code verify
@@ -189,13 +189,13 @@ func ForgotPassword(c *gin.Context) {
 	if err1 := configg.KoneksiData().Debug().Model(&user).Where("email = ?", Forgotpw.Email).Update(&token).Error; err1 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
-			"message": "Invalid email",
+			"message": "Failed update code",
 		})
 		return
 	}
 
 	//  Send code to email
-	if helper.Sendemail(user.Email, token.Code) != nil {
+	if helper.Sendemail(Forgotpw.Email, token.Code) != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    http.StatusOK,
 			"message": "Failed Send email",
@@ -208,6 +208,7 @@ func ForgotPassword(c *gin.Context) {
 		"message":   "Please Check your Spam Email",
 		"your_code": token.Code,
 	})
+
 }
 
 func Authyverify(c *gin.Context) {
