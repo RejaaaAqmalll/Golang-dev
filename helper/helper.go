@@ -50,6 +50,5 @@ func Sendemail(email string, code string) error {
 	}
 
 	// Respon
-	fmt.Println("Your code has been send")
 	return nil
 }

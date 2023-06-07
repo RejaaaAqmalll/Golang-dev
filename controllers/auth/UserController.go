@@ -195,7 +195,7 @@ func ForgotPassword(c *gin.Context) {
 	}
 
 	//  Send code to email
-	if helper.Sendemail(Forgotpw.Email, token.Code) != nil {
+	if helper.Sendemail(user.Email, token.Code) != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code":    http.StatusOK,
 			"message": "Failed Send email",
