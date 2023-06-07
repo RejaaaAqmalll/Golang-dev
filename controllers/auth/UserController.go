@@ -176,12 +176,12 @@ func ForgotPassword(c *gin.Context) {
 
 	// check email yang masuk
 	var user models.Users
-	if err := configg.KoneksiData().Debug().Where("email = ?", Forgotpw.Email).Error; err != nil {
+	if err := configg.KoneksiData().Debug().Where("email = ?", Forgotpw.Email).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "Invalid email",
 		})
-
+		return
 	}
 
 	// Insert a code verify
