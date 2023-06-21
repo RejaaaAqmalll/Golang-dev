@@ -80,18 +80,19 @@ func Login(c *gin.Context) {
 	err1 := configg.KoneksiData().Debug().First(&user, "email = ?", body.Email).Error
 
 	if err1 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
 			"message": "Invalid User or Password",
 			"status":  false,
+			"error":   err1.Error(),
 		})
 		return
 	}
 
 	if user.ID == 0 {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": "Invalid User or Password",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "User Not found",
 			"status":  false,
 		})
 		return
@@ -99,10 +100,11 @@ func Login(c *gin.Context) {
 	// Membandigkan password user dengan password pada database
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
 			"message": "Invalid User or Password",
 			"status":  false,
+			"error":   err.Error(),
 		})
 		return
 	}
@@ -118,8 +120,8 @@ func Login(c *gin.Context) {
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
 			"message": "Cannot get jwt token",
 		})
 		return
@@ -130,7 +132,7 @@ func Login(c *gin.Context) {
 	c.SetCookie("Authorizion", tokenString, 3600*24*30, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{
 		"code":       http.StatusOK,
-		"email":      user.Email,
+		"message":    "login success",
 		"your token": tokenString,
 	})
 }
@@ -277,15 +279,17 @@ func ResetPassword(c *gin.Context) {
 			"message": "Can't Bind data",
 			"status":  false,
 		})
+		return
 	}
 
 	// Compare new pass with confirm pass
 	if inputPass.NewPassword != inputPass.ConfirmPassword {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
 			"message": "password must be the same",
 			"status":  false,
 		})
+		return
 	}
 
 	// Hash password
@@ -297,6 +301,7 @@ func ResetPassword(c *gin.Context) {
 			"message": "failed hash password",
 			"status":  false,
 		})
+		return
 	}
 
 	var user models.Users
@@ -307,6 +312,7 @@ func ResetPassword(c *gin.Context) {
 			"message": "Invalid Password",
 			"status":  false,
 		})
+		return
 	}
 
 	//  Respond Final
