@@ -67,11 +67,11 @@ func Login(c *gin.Context) {
 		Password string
 	}
 	// Binding / mengikat
-	if c.Bind(&body) != nil {
+	if c.ShouldBindJSON(&body) != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
 			"message": "cannot Binding data",
-			"status":  false,
+			// "status":  false,
 		})
 		return
 	}
@@ -83,8 +83,8 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "Invalid User or Password",
-			"status":  false,
-			"error":   err1.Error(),
+			// "status":  false,
+			// "error":   err1.Error(),
 		})
 		return
 	}
@@ -93,7 +93,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "User Not found",
-			"status":  false,
+			// "status":  false,
 		})
 		return
 	}
@@ -103,8 +103,8 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "Invalid User or Password",
-			"status":  false,
-			"error":   err.Error(),
+			// "status":  false,
+			// "error":   err.Error(),
 		})
 		return
 	}
@@ -131,9 +131,9 @@ func Login(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorizion", tokenString, 3600*24*30, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{
-		"code":       http.StatusOK,
-		"message":    "login success",
-		"your token": tokenString,
+		"code":    http.StatusOK,
+		"message": "login success",
+		"token":   tokenString,
 	})
 }
 
